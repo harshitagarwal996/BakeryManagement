@@ -1,55 +1,32 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from rest_framework import generics, permissions, status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
-from rest_framework_jwt.settings import api_settings
-from rest_framework import permissions, status, generics
-
-from api.serializers import TokenSerializer
-
-jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+from api import serializers
 
 
-class LoginView(generics.CreateAPIView):
-    permission_classes = (permissions.AllowAny,)
 
-    queryset = User.objects.all()
+
+class RegisterBakery(generics.CreateAPIView):
+    permission_classes = (permissions.IsAdminUser,)
 
     def post(self, request, *args, **kwargs):
-        username = request.data.get("username", "")
-        password = request.data.get("password", "")
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            serializer = TokenSerializer(data={
-                "token": jwt_encode_handler(
-                    jwt_payload_handler(user)
-                )})
-            serializer.is_valid()
-            return Response(serializer.data)
-        return Response("Please enter valid username and password", status=status.HTTP_401_UNAUTHORIZED)
-
-
-
-class RegisterUsersView(generics.CreateAPIView):
-    permission_classes = (permissions.AllowAny,)
-
-    def post(self, request, *args, **kwargs):
-        username = request.data.get("username", "")
-        password = request.data.get("password", "")
-        email = request.data.get("email", "")
-        if not username and not password and not email:
-            return Response(
-                data={
-                    "message": "username, password and email is required to register a user"
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        new_user = User.objects.create_user(
-            username=username, password=password, email=email
+        data = {key: request.data[key] for key in request.data.keys()}
+        data['user'] = request.user.id
+        serialized_data = serializers.BakerySerializer(data=data)
+        serialized_data.is_valid(raise_exception=True)
+        bakery = serialized_data.save()
+        inventory_data = serializers.SerializeInventory(
+            data = {
+                "name": data["bakery_name"]+" Inventory",
+                "bakery": bakery.id
+            }
         )
-        return Response(status=status.HTTP_201_CREATED)
+        inventory_data.is_valid()
+        inventory_data.save()
+        return Response("Success", status=status.HTTP_200_OK)
+
 
 
 class ListSongsView(ListAPIView):
