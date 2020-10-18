@@ -56,11 +56,16 @@ Django (using Django Rest Framework for designing APIs is preferred)
 
 Postgres / SQLite / MySQL
 
+## **Tech Stack**
+Django
 
+PostgreSQL
 
+RestFramework
 
 ## **PROJECT SETUP**
 
+**Database Setup**
 
 postgres=# CREATE USER bakeryadmin WITH PASSWORD 'bakeryadmin';
 CREATE ROLE
@@ -68,3 +73,23 @@ postgres=# ALTER USER bakeryadmin CREATEDB;
 ALTER ROLE
 
 createdb bakerymanagement
+
+**Project Interpreter**
+Python 3.8
+
+Using a virtual environment is recommended
+
+**Install requirements**
+pip3 install -r requirements.txt
+
+**Django Setup**
+
+In your project directory use the following commands
+
+python3 manage.py migrate
+
+python3 manage.py runserver
+
+**API collections**
+
+Postman collection link: https://www.getpostman.com/collections/3fcaeeb1194cfab42db8
