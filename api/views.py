@@ -1,7 +1,5 @@
 import json
 
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
 from rest_framework import generics, permissions, status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
@@ -24,21 +22,23 @@ class RegisterBakery(generics.CreateAPIView):
         serialized_data.is_valid(raise_exception=True)
         bakery = serialized_data.save()
         inventory_data = serializers.SerializeInventory(
-            data = {
-                "name": data["bakery_name"]+" Inventory",
+            data={
+                "name": data["bakery_name"] + " Inventory",
                 "bakery": bakery.id
             }
         )
         inventory_data.is_valid()
         inventory_data.save()
-        return Response("Bakery and Inventory Created successfully, you can now add items in your Inventory", status=status.HTTP_200_OK)
+        return Response("Bakery and Inventory Created successfully, you can now add items in your Inventory",
+                        status=status.HTTP_200_OK)
 
 
 class ManageInventoryIngredients(APIView):
     permission_classes = (permissions.IsAdminUser,)
 
     def get(self, request, format=None):
-        return Response(IngredientSerializer(request.user.bakery.inventory.ingredients, many=True).data, status=status.HTTP_200_OK)
+        return Response(IngredientSerializer(request.user.bakery.inventory.ingredients, many=True).data,
+                        status=status.HTTP_200_OK)
 
     def put(self, request, *args, **kwargs):
         data = {key: request.data[key] for key in request.data.keys()}
@@ -77,7 +77,8 @@ class ManageBakeryProduct(APIView):
 
     def post(self, request, *args, **kwargs):
         if not request.data.get('ingredient_quantity_mappings'):
-            return Response("Please enter the ingredient id and quantity mapping to ingredient_quantity_mappings", status.HTTP_400_BAD_REQUEST)
+            return Response("Please enter the ingredient id and quantity mapping to ingredient_quantity_mappings",
+                            status.HTTP_400_BAD_REQUEST)
         data = {key: request.data[key] for key in request.data.keys()}
         bakery_id = self.request.user.bakery.id
         data['bakery'] = bakery_id
@@ -95,7 +96,6 @@ class ManageBakeryProduct(APIView):
         return Response("Product saved successfully in your Bakery", status.HTTP_200_OK)
 
 
-
 # Customer APIViews starts here
 
 class GetBakeryList(ListAPIView):
@@ -106,11 +106,14 @@ class GetBakeryList(ListAPIView):
 
 class GetProductsFromBakery(generics.RetrieveAPIView):
     permission_classes = (permissions.IsAuthenticated,)
+
     def get(self, request, format=None):
         if not request.GET.get('bakery_id'):
             return Response("Please enter param bakery_id", status.HTTP_400_BAD_REQUEST)
-        return Response(ProductSerializer(models.Product.objects.filter(bakery=request.GET.get('bakery_id')), many=True).data,
-                        status=status.HTTP_200_OK)
+        return Response(
+            ProductSerializer(models.Product.objects.filter(bakery=request.GET.get('bakery_id')), many=True).data,
+            status=status.HTTP_200_OK)
+
 
 class CustomerOrder(APIView):
     permission_classes = (permissions.IsAuthenticated,)
