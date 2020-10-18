@@ -21,7 +21,11 @@ class RegisterBakeryAdmin(generics.CreateAPIView):
         except:
             return Response("username, password and email is required to register a user",
                             status=status.HTTP_400_BAD_REQUEST)
-        new_user = User.objects.create_user(username=username, password=password, email=email, is_staff=True)
+        try:
+            new_user = User.objects.create_user(username=username, password=password, email=email, is_staff=True)
+        except:
+            # TODO: add code for data validations
+            return Response("User already exist or data validations failed", status.HTTP_409_CONFLICT)
         return Response("Bakery Admin " + username + " created successfully", status=status.HTTP_201_CREATED)
 
 
@@ -36,7 +40,10 @@ class RegisterUsersView(generics.CreateAPIView):
         except:
             return Response("username, password and email is required to register a user",
                             status=status.HTTP_400_BAD_REQUEST)
-        new_user = User.objects.create_user(username=username, password=password, email=email, is_staff=False)
+        try:
+            new_user = User.objects.create_user(username=username, password=password, email=email, is_staff=False)
+        except:
+            return Response("User already exist or data validations failed", status.HTTP_409_CONFLICT)
         return Response("Customer " + username + " created successfully", status=status.HTTP_201_CREATED)
 
 
