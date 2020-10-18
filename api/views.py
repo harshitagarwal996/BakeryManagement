@@ -25,7 +25,7 @@ class RegisterBakery(generics.CreateAPIView):
         )
         inventory_data.is_valid()
         inventory_data.save()
-        return Response("Success", status=status.HTTP_200_OK)
+        return Response("Bakery Created successfully, you can now add items in your inventory your Inventory", status=status.HTTP_200_OK)
 
 
 

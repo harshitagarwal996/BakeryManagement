@@ -10,7 +10,7 @@ from django.db.models import Model
 
 
 class Bakery(Model):
-    user = models.ForeignKey(User, verbose_name="Bakery Owner",null=False, blank=False, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, verbose_name="Bakery Owner", null=False, blank=False, on_delete=models.CASCADE)
     bakery_name = models.CharField(max_length=50, null=False, blank=False)
     address = models.CharField(max_length=200, null=False, blank=False)
     gst_number = models.CharField(max_length=100, null=True, blank=True)
