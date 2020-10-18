@@ -33,7 +33,7 @@ class Product(Model):
     price = models.IntegerField(null=False)
     name = models.CharField(max_length=50, null=False, blank=False)
     bakery = models.ForeignKey(Bakery, related_name="products", null=False, blank=False, on_delete=models.CASCADE)
-
+    quantity_available = models.IntegerField()
 
 class IngredientQuantityMapping(Model):
     # Maps the quantity required for particular ingredient used in linked product
